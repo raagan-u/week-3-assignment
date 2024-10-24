@@ -5,9 +5,8 @@ use crate::models::allowed_model::AllowedModel;
 use async_trait::async_trait; // Ensure you import async_trait
 use futures::StreamExt;
 use mongodb::{
-    bson::{self, doc, to_document, Document},
+    bson::{self, doc, to_document, Bson, Document},
     error::{Error, ErrorKind, WriteFailure},
-    options::FindOptions,
     Client, Collection, Database,
 }; // Import Document
 use std::error::Error as StdError;
@@ -44,37 +43,87 @@ impl HistoryCRUD for MongoDbStore {
         order: String,
         page: u32,
         limit: u32,
+        count: u32,
+        interval: Option<String>,
     ) -> Result<Vec<AllowedModel>, Box<dyn StdError>> {
-        let mut query_filter = bson::doc! {};
+        let mut pipeline = vec![];
+
+        // Date filtering if start_epoch and end_epoch are provided
+        println!("inside mongo insert");
         println!("{:#?} {:#?}", start_epoch, end_epoch);
         if let (Some(start), Some(end)) = (start_epoch, end_epoch) {
-            query_filter.insert("startTime", doc! { "$gte": start });
-            query_filter.insert("endTime", doc! { "$lte": end });
+            pipeline.push(doc! {
+                "$match": {
+                    "startTime": {
+                        "$gte": start
+                    },
+                    "endTime": {
+                        "$lte": end
+                    }
+                }
+            });
         }
 
-        // Apply filters
-        if let Some(liquidity) = liquidity_gt {
-            query_filter.insert("liquidityUnits", bson::doc! { "$gt": liquidity });
+        // Liquidity filter if specified
+        if let Some(liquidity_gt_value) = liquidity_gt {
+            pipeline.push(doc! {
+                "$match": {
+                    "liquidityUnits": {
+                        "$gt": Bson::Int64(liquidity_gt_value),
+                    }
+                }
+            });
         }
 
-        // Pagination and sorting
-        let skip = (page - 1) * limit;
-        let sort_order = if order == "desc" { -1 } else { 1 };
-        let sort_doc = bson::doc! { sort_by: sort_order };
+        // Handle intervals if provided
+        if let Some(interval_value) = interval {
+            let time_unit = match interval_value.as_str() {
+                "5min" => 5 * 60,
+                "hour" => 60 * 60,
+                "day" => 24 * 60 * 60,
+                "week" => 7 * 24 * 60 * 60,
+                "month" => 30 * 24 * 60 * 60,
+                "quarter" => 3 * 30 * 24 * 60 * 60,
+                "year" => 365 * 24 * 60 * 60,
+                _ => 60 * 60, // Default to 1 hour if unknown
+            };
 
-        let find_options = FindOptions::builder()
-            .sort(Some(sort_doc)) // Apply sorting
-            .skip(Some(skip as u64)) // Skip documents for pagination
-            .limit(Some(limit as i64)) // Limit the number of results
-            .build();
+            // Calculate bucket boundaries using start_epoch/end_epoch
+            pipeline.push(doc! {
+                "$bucketAuto": {
+                    "groupBy": "$startTime",  // Group by startTime instead of timestamp
+                    "buckets": count,  // Limit number of buckets based on count
+                    "output": {
+                        "assetDepth": { "$avg": "$assetDepth" },  // Averaging asset depth
+                        "runeDepth": { "$avg": "$runeDepth" },    // Averaging rune depth
+                        "assetPrice": { "$avg": "$assetPrice" },  // Averaging asset price in Rune
+                        "assetPriceUSD": { "$avg": "$assetPriceUSD" },  // Averaging asset price in USD
+                    }
+                }
+            });
+        }
+
+        // Sorting based on the specified field and order
+        let sort_order = if order == "asc" { 1 } else { -1 };
+        pipeline.push(doc! {
+            "$sort": {
+                sort_by: sort_order
+            }
+        });
+
+        // Apply pagination (skip and limit)
+        let skip_value = (page - 1) * limit;
+        pipeline.push(doc! { "$skip": skip_value as i64 });
+        pipeline.push(doc! { "$limit": limit as i64 });
 
         let collection = self.database.collection::<Document>(collection_name); // Specify Document type
-        let mut cursor = collection.find(query_filter, find_options).await?;
+        let mut cursor = collection.aggregate(pipeline, None).await?;
         let mut histories = Vec::new();
 
         while let Some(result) = cursor.next().await {
             match result {
                 Ok(document) => {
+                    println!("{:#?}", document);
                     // Attempt to deserialize the document into AllowedModel
                     match bson::from_document::<AllowedModel>(document) {
                         Ok(depth_history) => {

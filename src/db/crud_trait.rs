@@ -12,6 +12,8 @@ pub trait HistoryCRUD: Send + Sync {
         order: String,
         page: u32,
         limit: u32,
+        count: u32,
+        interval: Option<String>,
     ) -> Result<Vec<AllowedModel>, Box<dyn std::error::Error>>;
 
     async fn create_history(

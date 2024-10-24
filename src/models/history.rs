@@ -225,6 +225,6 @@ pub struct HistoryQuery {
     pub limit: Option<u32>,         // Number of items per page
     pub from: Option<i64>,
     pub to: Option<i64>,
-    pub count: Option<i64>,
+    pub count: Option<u32>,
     pub interval: Option<String>,
 }

@@ -46,7 +46,7 @@ impl HistoryCRUD for MongoDbStore {
         limit: u32,
     ) -> Result<Vec<AllowedModel>, Box<dyn StdError>> {
         let mut query_filter = bson::doc! {};
-
+        println!("{:#?} {:#?}", start_epoch, end_epoch);
         if let (Some(start), Some(end)) = (start_epoch, end_epoch) {
             query_filter.insert("startTime", doc! { "$gte": start });
             query_filter.insert("endTime", doc! { "$lte": end });
@@ -72,11 +72,9 @@ impl HistoryCRUD for MongoDbStore {
         let mut cursor = collection.find(query_filter, find_options).await?;
         let mut histories = Vec::new();
 
-        println!("something");
         while let Some(result) = cursor.next().await {
             match result {
                 Ok(document) => {
-                    println!("{:#?}", document);
                     // Attempt to deserialize the document into AllowedModel
                     match bson::from_document::<AllowedModel>(document) {
                         Ok(depth_history) => {

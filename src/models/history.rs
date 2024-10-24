@@ -223,4 +223,8 @@ pub struct HistoryQuery {
     pub order: Option<String>,      // "asc" or "desc"
     pub page: Option<u32>,          // Page number for pagination
     pub limit: Option<u32>,         // Number of items per page
+    pub from: Option<i64>,
+    pub to: Option<i64>,
+    pub count: Option<i64>,
+    pub interval: Option<String>,
 }

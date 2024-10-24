@@ -10,9 +10,15 @@ use db::mongo_db::MongoDbStore;
 use dotenv::dotenv;
 use env_logger;
 use handlers::hist_handlers::{
-    add_depth_history, add_earnings_history, add_rune_pool_history, add_swap_history,
-    get_depth_history, get_earnings_history, get_runepool_history, get_swap_history,
-    update_depth_history, update_earnings_history, update_runepool_history, update_swap_history,
+    add_depth_history,
+    add_earnings_history,
+    add_rune_pool_history,
+    add_swap_history,
+    get_depth_history, //get_earnings_history, get_runepool_history, get_swap_history,
+    update_depth_history,
+    update_earnings_history,
+    update_runepool_history,
+    update_swap_history,
 };
 use std::env;
 use std::sync::Arc;
@@ -43,9 +49,9 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(store_data.clone())
             .service(get_depth_history)
-            .service(get_earnings_history)
-            .service(get_swap_history)
-            .service(get_runepool_history)
+            //.service(get_earnings_history)
+            //.service(get_swap_history)
+            //.service(get_runepool_history)
             .service(add_depth_history)
             .service(add_earnings_history)
             .service(add_swap_history)

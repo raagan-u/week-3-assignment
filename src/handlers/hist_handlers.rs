@@ -30,10 +30,17 @@ pub async fn get_depth_history(
         .unwrap_or_else(|| "asc".to_string());
     let page = query_params.page.unwrap_or(1);
     let limit = query_params.limit.unwrap_or(10);
-
+    // gives preference to date_range before from,to
     let (start_epoch, end_epoch) = if date_range.is_none() {
         // If date_range is None, don't apply date filters
-        (None, None)
+        if query_params.from.is_none() && query_params.to.is_none() {
+            (None, None)
+        } else {
+            (
+                Some(query_params.from.unwrap_or(0)),
+                Some(query_params.to.unwrap_or(chrono::Utc::now().timestamp())),
+            )
+        }
     } else {
         match parse_date_range_to_epoch(date_range.clone()) {
             Ok((start, end)) => (Some(start), Some(end)), // If parsing is successful, set date ranges
@@ -62,7 +69,7 @@ pub async fn get_depth_history(
     }
 }
 
-#[get("/get-earnings-history")]
+/*#[get("/get-earnings-history")]
 pub async fn get_earnings_history(
     db: Data<dyn HistoryCRUD>,
     query: web::Query<HistoryQuery>,
@@ -223,15 +230,13 @@ pub async fn get_runepool_history(
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }
-
+*/
 #[post("/add-depth-history")]
 pub async fn add_depth_history(
     db: Data<dyn HistoryCRUD>,
     history: Json<AllowedModel>,
 ) -> HttpResponse {
-    println!("entered addpet");
     let history = history.into_inner();
-    println!("{:#?}", history);
     match db.create_history("depth_history", history).await {
         Ok(history) => HttpResponse::Ok().json(history),
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),

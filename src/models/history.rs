@@ -214,3 +214,13 @@ pub struct RunePoolHistory {
     #[serde(deserialize_with = "deserialize_i64_from_string_or_number")]
     pub units: i64,
 }
+
+#[derive(Deserialize)]
+pub struct HistoryQuery {
+    pub date_range: Option<String>, // e.g., "2023-08-01,2023-09-01"
+    pub liquidity_gt: Option<i64>,  // Filter by liquidity greater than
+    pub sort_by: Option<String>,    // Sorting field, e.g., "timestamp"
+    pub order: Option<String>,      // "asc" or "desc"
+    pub page: Option<u32>,          // Page number for pagination
+    pub limit: Option<u32>,         // Number of items per page
+}

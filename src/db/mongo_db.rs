@@ -7,6 +7,7 @@ use futures::StreamExt;
 use mongodb::{
     bson::{self, doc, to_document, Document},
     error::{Error, ErrorKind, WriteFailure},
+    options::FindOptions,
     Client, Collection, Database,
 }; // Import Document
 use std::error::Error as StdError;
@@ -36,9 +37,39 @@ impl HistoryCRUD for MongoDbStore {
     async fn read_history(
         &self,
         collection_name: &str,
+        start_epoch: Option<i64>,
+        end_epoch: Option<i64>,
+        liquidity_gt: Option<i64>,
+        sort_by: String,
+        order: String,
+        page: u32,
+        limit: u32,
     ) -> Result<Vec<AllowedModel>, Box<dyn StdError>> {
+        let mut query_filter = bson::doc! {};
+
+        if let (Some(start), Some(end)) = (start_epoch, end_epoch) {
+            query_filter.insert("startTime", doc! { "$gte": start });
+            query_filter.insert("endTime", doc! { "$lte": end });
+        }
+
+        // Apply filters
+        if let Some(liquidity) = liquidity_gt {
+            query_filter.insert("liquidityUnits", bson::doc! { "$gt": liquidity });
+        }
+
+        // Pagination and sorting
+        let skip = (page - 1) * limit;
+        let sort_order = if order == "desc" { -1 } else { 1 };
+        let sort_doc = bson::doc! { sort_by: sort_order };
+
+        let find_options = FindOptions::builder()
+            .sort(Some(sort_doc)) // Apply sorting
+            .skip(Some(skip as u64)) // Skip documents for pagination
+            .limit(Some(limit as i64)) // Limit the number of results
+            .build();
+
         let collection = self.database.collection::<Document>(collection_name); // Specify Document type
-        let mut cursor = collection.find(None, None).await?;
+        let mut cursor = collection.find(query_filter, find_options).await?;
         let mut histories = Vec::new();
 
         println!("something");

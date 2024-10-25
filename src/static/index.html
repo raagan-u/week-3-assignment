@@ -1,5 +1,190 @@
-<html>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>API Documentation</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+            h1 {
+                color: #4caf50;
+            }
+            h2 {
+                color: #333;
+            }
+            .endpoint {
+                margin-bottom: 20px;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
+            .params,
+            .examples {
+                margin-top: 10px;
+                padding-left: 20px;
+            }
+            code {
+                background-color: #f4f4f4;
+                padding: 2px 4px;
+                border-radius: 3px;
+            }
+        </style>
+    </head>
     <body>
-        <h1>WELCOME TO API</h1>
+        <h1>API Documentation</h1>
+        <p>
+            This document provides information on how to use the available
+            endpoints in this API, including query parameters for pagination,
+            sorting, and filtering.
+        </p>
+
+        <div class="endpoint">
+            <h2>1. Get Depths History</h2>
+            <p>
+                <strong>Endpoint:</strong> <code>GET /get-depths-history</code>
+            </p>
+            <p>
+                <strong>Description:</strong> Retrieves depths history with
+                optional filtering, pagination, and sorting options.
+            </p>
+
+            <div class="params">
+                <h3>Query Parameters</h3>
+                <ul>
+                    <li>
+                        <code>date_range</code>: Date range filter in a specific
+                        format.
+                    </li>
+                    <li><code>from</code>: Start date (timestamp).</li>
+                    <li><code>to</code>: End date (timestamp).</li>
+                    <li>
+                        <code>liquidity_gt</code>: Minimum liquidity filter.
+                    </li>
+                    <li>
+                        <code>sort_by</code>: Field to sort by (default:
+                        <code>timestamp</code>).
+                    </li>
+                    <li>
+                        <code>order</code>: Sorting order (<code>asc</code> or
+                        <code>desc</code>).
+                    </li>
+                    <li>
+                        <code>page</code>: Page number for pagination (default:
+                        <code>1</code>).
+                    </li>
+                    <li>
+                        <code>limit</code>: Number of results per page (default:
+                        <code>10</code>).
+                    </li>
+                    <li>
+                        <code>count</code>: Total number of records to fetch
+                        (default: <code>30</code>).
+                    </li>
+                    <li>
+                        <code>interval</code>: Time interval between records.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="examples">
+                <h3>Example Request</h3>
+                <code
+                    >GET
+                    /get-depths-history?from=1620000000&to=1630000000&liquidity_gt=5000&sort_by=timestamp&order=desc&page=2&limit=15</code
+                >
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <h2>2. Get Earnings History</h2>
+            <p>
+                <strong>Endpoint:</strong>
+                <code>GET /get-earnings-history</code>
+            </p>
+            <p>
+                <strong>Description:</strong> Retrieves earnings history with
+                filtering, sorting, and pagination options.
+            </p>
+
+            <div class="params">
+                <h3>Query Parameters</h3>
+                <ul>
+                    <li>
+                        Same parameters as
+                        <strong>Get Depths History</strong> (see above).
+                    </li>
+                </ul>
+            </div>
+
+            <div class="examples">
+                <h3>Example Request</h3>
+                <code
+                    >GET
+                    /get-earnings-history?date_range=2021-01-01_to_2021-12-31&order=asc&limit=20</code
+                >
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <h2>3. Get Swaps History</h2>
+            <p>
+                <strong>Endpoint:</strong> <code>GET /get-swaps-history</code>
+            </p>
+            <p>
+                <strong>Description:</strong> Retrieves swaps history with
+                options for pagination, sorting, and filtering.
+            </p>
+
+            <div class="params">
+                <h3>Query Parameters</h3>
+                <ul>
+                    <li>
+                        Same parameters as
+                        <strong>Get Depths History</strong> (see above).
+                    </li>
+                </ul>
+            </div>
+
+            <div class="examples">
+                <h3>Example Request</h3>
+                <code
+                    >GET
+                    /get-swaps-history?from=1620000000&sort_by=timestamp&order=desc&liquidity_gt=1000&page=1&limit=10</code
+                >
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <h2>4. Get Rune Pool History</h2>
+            <p>
+                <strong>Endpoint:</strong>
+                <code>GET /get-runepool-history</code>
+            </p>
+            <p>
+                <strong>Description:</strong> Retrieves history of the Rune pool
+                with various filtering, pagination, and sorting options.
+            </p>
+
+            <div class="params">
+                <h3>Query Parameters</h3>
+                <ul>
+                    <li>
+                        Same parameters as
+                        <strong>Get Depths History</strong> (see above).
+                    </li>
+                </ul>
+            </div>
+
+            <div class="examples">
+                <h3>Example Request</h3>
+                <code
+                    >GET
+                    /get-runepool-history?to=1630000000&sort_by=timestamp&order=asc&page=3&limit=5&count=50</code
+                >
+            </div>
+        </div>
     </body>
 </html>

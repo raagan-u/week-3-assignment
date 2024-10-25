@@ -41,7 +41,7 @@ async fn main() -> std::io::Result<()> {
 
     let store_arc: Arc<dyn HistoryCRUD> = Arc::new(repo);
     let store_data: Data<dyn HistoryCRUD> = Data::from(store_arc);
-
+    let port = env::var("PORT").unwrap_or_else(|_| "3000".to_string());
     HttpServer::new(move || {
         App::new()
             .app_data(store_data.clone())
@@ -69,7 +69,7 @@ async fn main() -> std::io::Result<()> {
             .service(delete_earnings_history)
             .service(delete_runepool_history)
     })
-    .bind(("0.0.0.0", 3000))?
+    .bind(("0.0.0.0", port.parse::<u16>().unwrap()))?
     .run()
     .await
 }

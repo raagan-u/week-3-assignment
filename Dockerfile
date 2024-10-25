@@ -20,7 +20,7 @@ RUN rm -f src/fetcher.rs  # Remove fetcher.rs if it exists
 RUN cargo build --release
 
 # Set up the final image
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 # Copy the built binary from the "builder" stage to the runtime image
 COPY --from=builder /week-3-assignment/target/release/week-3-assignment /usr/local/bin/week-3-assignment

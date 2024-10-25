@@ -3,10 +3,8 @@ name = "week-3-assignment"
 version = "0.1.0"
 edition = "2021"
 
+exclude = ["src/fetcher.rs"]
 
-[[bin]]
-name = "fetcher"
-path = "src/fetcher.rs"
 
 
 [dependencies]

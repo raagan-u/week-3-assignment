@@ -1,60 +1,92 @@
-use reqwest::Client;
-use serde_json::Value;
+use reqwest::blocking::Client as HttpClient;
+use reqwest::blocking::Response;
+use serde_json::{json, Value};
 use std::error::Error;
+use std::time::Duration;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let api_url = "https://midgard.ninerealms.com/v2/history/runepool";
-
-    // Create a reqwest client with TLS verification disabled
-    let client = Client::builder()
-        .danger_accept_invalid_certs(true) // WARNING: This disables SSL verification
-        .build()?;
-
-    // Fetch the data from the API
-    let response = client.get(api_url).send().await?;
-
-    if response.status().is_success() {
-        let body: Value = response.json().await?;
-
-        // Extract intervals from the response
-        if let Some(intervals) = body["intervals"].as_array() {
-            for interval in intervals {
-                // Create hist_id (you can use a UUID or any other logic)
-
-                // Create a mutable copy of the interval and add the hist_id
-                let mut interval_with_id = interval.clone();
-                interval_with_id["histId"] = Value::from(989008);
-                // Now post the updated interval to your endpoint
-                println!("{:#?}", interval_with_id);
-                post_interval(&client, &interval_with_id).await?;
-            }
-        } else {
-            eprintln!("No intervals found in the response.");
-        }
-    } else {
-        eprintln!("Failed to fetch data: {}", response.status());
-    }
-
-    Ok(())
+fn fetch_swaps(from: i64) -> Result<Value, reqwest::Error> {
+    let url = format!(
+        "https://midgard.ninerealms.com/v2/history/depths/BTC.BTC?interval=hour&count=400&from={}",
+        from
+    );
+    let client = HttpClient::new();
+    let response = client.get(&url).send()?;
+    let json = response.json::<Value>()?;
+    Ok(json)
 }
 
-// Function to post the interval to your API
-async fn post_interval(client: &Client, interval: &Value) -> Result<(), Box<dyn Error>> {
-    println!("{:#?}", interval);
-    let api_url = "http://127.0.0.1:8080/add-runepool-history"; // Replace with your actual API URL
+fn insert_interval(client: &HttpClient, interval: &Value) -> Result<(), Box<dyn Error>> {
+    let url = "http://127.0.0.1:8080/add-depth-history"; // Replace with your actual endpoint URL
 
     let response = client
-        .post(api_url)
-        .json(&interval) // Send the interval as JSON
-        .send()
-        .await?;
+        .post(url)
+        .json(interval) // Send the interval as JSON
+        .send()?;
 
     if response.status().is_success() {
-        println!("Posted interval successfully: {:#?}", interval);
+        println!("Inserted interval successfully.");
+        Ok(())
     } else {
-        eprintln!("Failed to post interval: {}", response.status());
+        let error_message = response
+            .text()
+            .unwrap_or_else(|_| "Failed to retrieve error message".to_string());
+        eprintln!("Error inserting interval: {}", error_message);
+        Err(format!("HTTP error: ").into())
+    }
+}
+
+fn main() {
+    let http_client = HttpClient::new(); // Create an HTTP client instance
+
+    let mut from: i64 = 1647129600; // March 13, 2022, in epoch time
+    let mut internal_vector: Vec<Value> = Vec::new();
+    let today_time: i64 = 1729821362;
+    let mut histid: i64 = 1;
+    loop {
+        match fetch_swaps(from) {
+            Ok(response) => {
+                if let Some(meta) = response.get("meta") {
+                    if let Some(end_time) = meta.get("endTime").and_then(|v| v.as_i64()) {
+                        if end_time >= today_time {
+                            break; // Stop if endTime is greater than or equal to the current epoch
+                        }
+                        from = end_time; // Update from
+                    }
+                }
+
+                if let Some(intervals) = response.get("intervals").and_then(|v| v.as_array()) {
+                    for interval1 in intervals {
+                        internal_vector.push(interval1.clone());
+                    }
+                }
+
+                // Insert each interval into your endpoint
+
+                for interval in &mut internal_vector {
+                    // Use &mut to mutate the interval
+                    // Add or update the histId field
+                    interval["histId"] = json!(histid); // Directly assign the new value
+
+                    // Print the updated interval object
+                    println!("{:#?}", interval);
+
+                    // Attempt to insert the interval
+                    if let Err(err) = insert_interval(&http_client, interval) {
+                        // Ensure you await the function
+                        eprintln!("Error inserting interval: {}", err);
+                    }
+
+                    histid += 1; // Increment histid for the next interval
+                }
+
+                std::thread::sleep(Duration::from_secs(1)); // Delay to avoid overwhelming the server
+            }
+            Err(err) => {
+                eprintln!("Error fetching data: {}", err);
+                break;
+            }
+        }
     }
 
-    Ok(())
+    println!("Total intervals fetched: {}", internal_vector.len());
 }

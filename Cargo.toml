@@ -19,6 +19,6 @@ actix-web = "4"
 dotenv = "0.15"
 env_logger = "0.10"
 
-reqwest = { version = "0.11.27", features = ["json", "rustls"] }
+reqwest = { version = "0.11.27", features = ["json", "rustls", "blocking"] }
 tokio = { version = "1", features = ["full"] }
 chrono = { version = "0.4", features = ["serde"] }

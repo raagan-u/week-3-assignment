@@ -46,36 +46,49 @@ impl HistoryCRUD for MongoDbStore {
         count: u32,
         interval: Option<String>,
     ) -> Result<Vec<AllowedModel>, Box<dyn StdError>> {
-        let mut pipeline = vec![];
+        let mut pipeline = Vec::new();
 
-        // Date filtering if start_epoch and end_epoch are provided
-        println!("inside mongo insert");
-        println!("{:#?} {:#?}", start_epoch, end_epoch);
+        if count != 30 && interval.is_none() {
+            return Err("Count parameter can only be used with interval".into());
+        }
+        println!("{} {}", count, limit);
+
+        // Build initial match stage combining all filters
+        let mut match_conditions = doc! {};
+
+        // Add date range conditions if provided
         if let (Some(start), Some(end)) = (start_epoch, end_epoch) {
-            pipeline.push(doc! {
-                "$match": {
-                    "startTime": {
-                        "$gte": start
+            match_conditions.insert(
+                "$and",
+                vec![
+                    doc! {
+                        "startTime": { "$gte": start }
                     },
-                    "endTime": {
-                        "$lte": end
-                    }
-                }
-            });
+                    doc! {
+                        "endTime": { "$lte": end }
+                    },
+                ],
+            );
         }
 
-        // Liquidity filter if specified
+        // Add liquidity filter if provided
         if let Some(liquidity_gt_value) = liquidity_gt {
+            match_conditions.insert(
+                "liquidityUnits",
+                doc! {
+                    "$gt": Bson::Int64(liquidity_gt_value)
+                },
+            );
+        }
+
+        // Only add match stage if we have conditions
+        if !match_conditions.is_empty() {
             pipeline.push(doc! {
-                "$match": {
-                    "liquidityUnits": {
-                        "$gt": Bson::Int64(liquidity_gt_value),
-                    }
-                }
+                "$match": match_conditions
             });
         }
 
-        // Handle intervals if provided
+        // Handle interval grouping if specified
         if let Some(interval_value) = interval {
             let time_unit = match interval_value.as_str() {
                 "5min" => 5 * 60,
@@ -85,59 +98,77 @@ impl HistoryCRUD for MongoDbStore {
                 "month" => 30 * 24 * 60 * 60,
                 "quarter" => 3 * 30 * 24 * 60 * 60,
                 "year" => 365 * 24 * 60 * 60,
-                _ => 60 * 60, // Default to 1 hour if unknown
+                _ => 60 * 60, // Default to 1 hour
             };
 
-            // Calculate bucket boundaries using start_epoch/end_epoch
+            // Group by time intervals
             pipeline.push(doc! {
-                "$bucketAuto": {
-                    "groupBy": "$startTime",  // Group by startTime instead of timestamp
-                    "buckets": count,  // Limit number of buckets based on count
-                    "output": {
-                        "assetDepth": { "$avg": "$assetDepth" },  // Averaging asset depth
-                        "runeDepth": { "$avg": "$runeDepth" },    // Averaging rune depth
-                        "assetPrice": { "$avg": "$assetPrice" },  // Averaging asset price in Rune
-                        "assetPriceUSD": { "$avg": "$assetPriceUSD" },  // Averaging asset price in USD
-                    }
+                "$group": {
+                    "_id": {
+                        "$toInt": { "$divide": ["$startTime", time_unit] }
+                    },
+                    "documents": { "$push": "$$ROOT" }
+                }
+            });
+
+            // Add sorting before limiting the buckets
+            let sort_order = if order.to_lowercase() == "asc" { 1 } else { -1 };
+            pipeline.push(doc! {
+                "$sort": {
+                    "_id": sort_order
+                }
+            });
+
+            // Now unwind the buckets to get individual documents
+            pipeline.extend(vec![
+                doc! {
+                    "$unwind": "$documents"
+                },
+                doc! {
+                    "$replaceRoot": { "newRoot": "$documents" }
+                },
+            ]);
+
+            // Sort the individual documents
+            pipeline.push(doc! {
+                "$sort": {
+                    sort_by: sort_order
+                }
+            });
+        } else {
+            // If no interval, just sort normally
+            let sort_order = if order.to_lowercase() == "asc" { 1 } else { -1 };
+            pipeline.push(doc! {
+                "$sort": {
+                    sort_by: sort_order
                 }
             });
         }
 
-        // Sorting based on the specified field and order
-        let sort_order = if order == "asc" { 1 } else { -1 };
-        pipeline.push(doc! {
-            "$sort": {
-                sort_by: sort_order
-            }
-        });
+        // count is has higher order precedence
 
-        // Apply pagination (skip and limit)
-        let skip_value = (page - 1) * limit;
-        pipeline.push(doc! { "$skip": skip_value as i64 });
-        pipeline.push(doc! { "$limit": limit as i64 });
+        let limit_val = if count != 30 { count } else { limit };
+        let skip_value = (page - 1) * limit_val;
+        pipeline.extend(vec![
+            doc! { "$skip": skip_value as i64 },
+            doc! { "$limit": limit_val as i64  },
+        ]);
 
-        let collection = self.database.collection::<Document>(collection_name); // Specify Document type
+        // Execute aggregation and collect results
+        let collection = self.database.collection::<Document>(collection_name);
         let mut cursor = collection.aggregate(pipeline, None).await?;
         let mut histories = Vec::new();
 
         while let Some(result) = cursor.next().await {
             match result {
-                Ok(document) => {
-                    println!("{:#?}", document);
-                    // Attempt to deserialize the document into AllowedModel
-                    match bson::from_document::<AllowedModel>(document) {
-                        Ok(depth_history) => {
-                            // Push the successfully deserialized model into items
-                            histories.push(depth_history);
-                        }
-                        Err(e) => {
-                            eprintln!("Error deserializing document to AllowedModel: {:?}", e);
-                        }
-                    }
-                }
-                Err(e) => eprintln!("Error retrieving histories: {:?}", e),
+                Ok(document) => match bson::from_document::<AllowedModel>(document) {
+                    Ok(history) => histories.push(history),
+                    Err(e) => eprintln!("Deserialization error: {:?}", e),
+                },
+                Err(e) => eprintln!("Cursor error: {:?}", e),
             }
         }
+
         Ok(histories)
     }
 

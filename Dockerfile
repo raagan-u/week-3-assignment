@@ -1,5 +1,5 @@
 # Use the official Rust image
-FROM rust:latest AS builder
+FROM debian:bullseye-slim
 
 # Create a new binary project directory
 RUN USER=root cargo new --bin week-3-assignment

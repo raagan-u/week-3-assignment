@@ -1,14 +1,14 @@
 use crate::db::crud_trait::HistoryCRUD;
 use crate::models::{allowed_model::AllowedModel, history::HistoryQuery};
 use actix_web::{
-    get, post, put,
+    delete, get, post, put,
     web::{self, Data, Json},
     HttpResponse,
 };
 use chrono::NaiveDate;
 use std::error::Error;
 
-#[get("/get-depth-history")]
+#[get("/get-depths-history")]
 pub async fn get_depth_history(
     db: Data<dyn HistoryCRUD>,
     query: web::Query<HistoryQuery>,
@@ -138,7 +138,7 @@ pub async fn get_earnings_history(
     }
 }
 
-#[get("/get-swap-history")]
+#[get("/get-swaps-history")]
 pub async fn get_swap_history(
     db: Data<dyn HistoryCRUD>,
     query: web::Query<HistoryQuery>,
@@ -268,7 +268,7 @@ pub async fn get_runepool_history(
     }
 }
 
-#[post("/add-depth-history")]
+#[post("/add-depths-history")]
 pub async fn add_depth_history(
     db: Data<dyn HistoryCRUD>,
     history: Json<AllowedModel>,
@@ -277,6 +277,66 @@ pub async fn add_depth_history(
     match db.create_history("depth_history", history).await {
         Ok(history) => HttpResponse::Ok().json(history),
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+    }
+}
+
+#[post("/add-depths-batch-history")]
+pub async fn add_depth_batch_history(
+    db: Data<dyn HistoryCRUD>,
+    histories: Json<Vec<AllowedModel>>,
+) -> HttpResponse {
+    let histories = histories.into_inner();
+    match db.create_batch_history("depth_history", histories).await {
+        Ok(success_message) => HttpResponse::Ok().body(success_message), // Return success message
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()), // Return error message
+    }
+}
+
+#[post("/add-earnings-batch-history")]
+pub async fn add_earnings_batch_history(
+    db: Data<dyn HistoryCRUD>,
+    histories: Json<Vec<AllowedModel>>,
+) -> HttpResponse {
+    let histories = histories.into_inner();
+    match db.create_batch_history("earnings_history", histories).await {
+        Ok(success_message) => HttpResponse::Ok().body(success_message), // Return success message
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()), // Return error message
+    }
+}
+
+#[post("/add-swaps-batch-history")]
+pub async fn add_swaps_batch_history(
+    db: Data<dyn HistoryCRUD>,
+    histories: Json<Vec<AllowedModel>>,
+) -> HttpResponse {
+    let histories = histories.into_inner();
+    match db.create_batch_history("swap_history", histories).await {
+        Ok(success_message) => HttpResponse::Ok().body(success_message), // Return success message
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()), // Return error message
+    }
+}
+
+#[post("/add-runepool-batch-history")]
+pub async fn add_runepool_batch_history(
+    db: Data<dyn HistoryCRUD>,
+    histories: Json<Vec<AllowedModel>>,
+) -> HttpResponse {
+    let histories = histories.into_inner();
+    match db.create_batch_history("runepool_history", histories).await {
+        Ok(success_message) => HttpResponse::Ok().body(success_message), // Return success message
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()), // Return error message
+    }
+}
+
+#[post("/add-pool-batch")]
+pub async fn add_pool_batch(
+    db: Data<dyn HistoryCRUD>,
+    histories: Json<Vec<AllowedModel>>,
+) -> HttpResponse {
+    let histories = histories.into_inner();
+    match db.create_batch_history("earnings_pools", histories).await {
+        Ok(success_message) => HttpResponse::Ok().body(success_message), // Return success message
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()), // Return error message
     }
 }
 
@@ -292,7 +352,16 @@ pub async fn add_earnings_history(
     }
 }
 
-#[post("/add-swap-history")]
+#[post("/add-pool")]
+pub async fn add_pools(db: Data<dyn HistoryCRUD>, history: Json<AllowedModel>) -> HttpResponse {
+    let history = history.into_inner();
+    match db.create_history("earnings_pools", history).await {
+        Ok(history) => HttpResponse::Ok().json(history),
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+    }
+}
+
+#[post("/add-swaps-history")]
 pub async fn add_swap_history(
     db: Data<dyn HistoryCRUD>,
     history: Json<AllowedModel>,
@@ -316,7 +385,7 @@ pub async fn add_rune_pool_history(
     }
 }
 
-#[put("/update-depth-history")]
+#[put("/update-depths-history")]
 pub async fn update_depth_history(
     db: Data<dyn HistoryCRUD>,
     history: Json<AllowedModel>,
@@ -328,7 +397,7 @@ pub async fn update_depth_history(
     }
 }
 
-#[put("/update-swap-history")]
+#[put("/update-swaps-history")]
 pub async fn update_swap_history(
     db: Data<dyn HistoryCRUD>,
     history: Json<AllowedModel>,
@@ -361,6 +430,60 @@ pub async fn update_runepool_history(
     match db.update_history("runepool_history", history).await {
         Ok(history) => HttpResponse::Ok().json(history),
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+    }
+}
+
+#[delete("/delete-depths-history/{hist_id}")]
+pub async fn delete_depth_history(db: Data<dyn HistoryCRUD>, path: web::Path<i64>) -> HttpResponse {
+    let hist_id = path.into_inner();
+    match db.delete_history("depth_history", hist_id).await {
+        Ok(_) => HttpResponse::Ok().body("History deleted successfully"),
+        Err(e) => {
+            eprintln!("Error deleting History: {:?}", e);
+            HttpResponse::InternalServerError().body("Failed to delete History")
+        }
+    }
+}
+
+#[delete("/delete-earnings-history/{hist_id}")]
+pub async fn delete_earnings_history(
+    db: Data<dyn HistoryCRUD>,
+    path: web::Path<i64>,
+) -> HttpResponse {
+    let hist_id = path.into_inner();
+    match db.delete_history("earnings_history", hist_id).await {
+        Ok(_) => HttpResponse::Ok().body("History deleted successfully"),
+        Err(e) => {
+            eprintln!("Error deleting History: {:?}", e);
+            HttpResponse::InternalServerError().body("Failed to delete History")
+        }
+    }
+}
+
+#[delete("/delete-swaps-history/{hist_id}")]
+pub async fn delete_swaps_history(db: Data<dyn HistoryCRUD>, path: web::Path<i64>) -> HttpResponse {
+    let hist_id = path.into_inner();
+    match db.delete_history("swap_history", hist_id).await {
+        Ok(_) => HttpResponse::Ok().body("History deleted successfully"),
+        Err(e) => {
+            eprintln!("Error deleting History: {:?}", e);
+            HttpResponse::InternalServerError().body("Failed to delete History")
+        }
+    }
+}
+
+#[delete("/delete-runepool-history/{hist_id}")]
+pub async fn delete_runepool_history(
+    db: Data<dyn HistoryCRUD>,
+    path: web::Path<i64>,
+) -> HttpResponse {
+    let hist_id = path.into_inner();
+    match db.delete_history("runepool_history", hist_id).await {
+        Ok(_) => HttpResponse::Ok().body("History deleted successfully"),
+        Err(e) => {
+            eprintln!("Error deleting History: {:?}", e);
+            HttpResponse::InternalServerError().body("Failed to delete History")
+        }
     }
 }
 

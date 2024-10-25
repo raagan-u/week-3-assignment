@@ -158,6 +158,8 @@ pub struct SwapHistory {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Pool {
+    #[serde(deserialize_with = "deserialize_i64_from_string_or_number")]
+    pub pool_id: i64,
     pub pool: String,
     #[serde(deserialize_with = "deserialize_i64_from_string_or_number")]
     pub asset_liquidity_fees: i64,
@@ -171,6 +173,8 @@ pub struct Pool {
     pub rewards: i64,
     #[serde(deserialize_with = "deserialize_i64_from_string_or_number")]
     pub earnings: i64,
+    #[serde(deserialize_with = "deserialize_i64_from_string_or_number")]
+    pub hist_id: i64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -197,7 +201,6 @@ pub struct EarningsHistory {
     #[serde(deserialize_with = "deserialize_f64_from_string_or_number")]
     #[serde(rename = "runePriceUSD")]
     pub rune_price_usd: f64,
-    pub pools: Vec<Pool>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

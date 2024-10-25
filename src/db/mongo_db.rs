@@ -215,6 +215,45 @@ impl HistoryCRUD for MongoDbStore {
         }
     }
 
+    async fn create_batch_history(
+        &self,
+        collection_name: &str,
+        histories: Vec<AllowedModel>, // Change to take a vector of AllowedModel
+    ) -> Result<String, Box<dyn StdError>> {
+        // Return a message instead of AllowedModel
+        println!("entered create_batch_history");
+        println!("{:#?}", histories);
+        let collection: Collection<AllowedModel> = self.database.collection(collection_name);
+
+        // Attempt to insert the documents
+        let result = collection.insert_many(histories.clone(), None).await;
+
+        // Handle the result with match
+        match result {
+            Ok(_) => {
+                // If successful, return a success message
+                Ok("All records inserted successfully.".to_string())
+            }
+            Err(ref e) => {
+                // Borrow the error and check if it's a Write error
+                if let ErrorKind::Write(ref write_failure) = *e.kind {
+                    if let WriteFailure::WriteError(ref write_error) = write_failure {
+                        // Check for duplicate key error code
+                        if write_error.code == 11000 {
+                            // Handle duplicate key error by returning a specific message
+                            return Err(Box::new(io::Error::new(
+                                io::ErrorKind::AlreadyExists,
+                                "One or more objects already exist", // Custom error message
+                            )));
+                        }
+                    }
+                }
+                // For other errors, return the error as is
+                Err(Box::new(e.clone())) // Return the original error
+            }
+        }
+    }
+
     async fn update_history(
         &self,
         collection_name: &str,
@@ -226,7 +265,7 @@ impl HistoryCRUD for MongoDbStore {
             // Handle other variants if necessary
             _ => return Err("Unsupported AllowedModel variant".into()),
         };
-        let filter = doc! { "hist_id": hist_id };
+        let filter = doc! { "histId": hist_id };
         let update = doc! { "$set": to_document(&history).map_err(|e| Box::new(e) as Box<dyn std::error::Error>)? };
         collection.update_one(filter, update, None).await?;
         Ok(history) // Return the updated p
@@ -238,7 +277,7 @@ impl HistoryCRUD for MongoDbStore {
         hist_id: i64,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let collection: Collection<AllowedModel> = self.database.collection(collection_name);
-        let filter = doc! { "hist_id": hist_id };
+        let filter = doc! { "histId": hist_id };
         collection.delete_one(filter, None).await?;
         Ok(())
     }

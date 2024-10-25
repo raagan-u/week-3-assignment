@@ -10,9 +10,12 @@ use db::mongo_db::MongoDbStore;
 use dotenv::dotenv;
 use env_logger;
 use handlers::hist_handlers::{
-    add_depth_history, add_earnings_history, add_rune_pool_history, add_swap_history,
-    get_depth_history, get_earnings_history, get_runepool_history, get_swap_history,
-    update_depth_history, update_earnings_history, update_runepool_history, update_swap_history,
+    add_depth_batch_history, add_depth_history, add_earnings_batch_history, add_earnings_history,
+    add_pool_batch, add_pools, add_rune_pool_history, add_runepool_batch_history, add_swap_history,
+    add_swaps_batch_history, delete_depth_history, delete_earnings_history,
+    delete_runepool_history, delete_swaps_history, get_depth_history, get_earnings_history,
+    get_runepool_history, get_swap_history, update_depth_history, update_earnings_history,
+    update_runepool_history, update_swap_history,
 };
 use std::env;
 use std::sync::Arc;
@@ -50,10 +53,20 @@ async fn main() -> std::io::Result<()> {
             .service(add_earnings_history)
             .service(add_swap_history)
             .service(add_rune_pool_history)
+            .service(add_pools)
+            .service(add_depth_batch_history)
+            .service(add_runepool_batch_history)
+            .service(add_earnings_batch_history)
+            .service(add_swaps_batch_history)
+            .service(add_pool_batch)
             .service(update_depth_history)
             .service(update_swap_history)
             .service(update_earnings_history)
             .service(update_runepool_history)
+            .service(delete_depth_history)
+            .service(delete_swaps_history)
+            .service(delete_earnings_history)
+            .service(delete_runepool_history)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

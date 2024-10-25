@@ -22,6 +22,12 @@ pub trait HistoryCRUD: Send + Sync {
         history: AllowedModel,
     ) -> Result<AllowedModel, Box<dyn std::error::Error>>;
 
+    async fn create_batch_history(
+        &self,
+        collection_name: &str,
+        histories: Vec<AllowedModel>,
+    ) -> Result<String, Box<dyn std::error::Error>>;
+
     async fn update_history(
         &self,
         collection_name: &str,

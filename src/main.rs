@@ -14,8 +14,8 @@ use handlers::hist_handlers::{
     add_pool_batch, add_pools, add_rune_pool_history, add_runepool_batch_history, add_swap_history,
     add_swaps_batch_history, delete_depth_history, delete_earnings_history,
     delete_runepool_history, delete_swaps_history, get_depth_history, get_earnings_history,
-    get_runepool_history, get_swap_history, update_depth_history, update_earnings_history,
-    update_runepool_history, update_swap_history,
+    get_runepool_history, get_swap_history, root_handler, update_depth_history,
+    update_earnings_history, update_runepool_history, update_swap_history,
 };
 use std::env;
 use std::sync::Arc;
@@ -45,6 +45,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(store_data.clone())
+            .service(root_handler)
             .service(get_depth_history)
             .service(get_earnings_history)
             .service(get_swap_history)

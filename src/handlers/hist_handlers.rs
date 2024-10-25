@@ -1,12 +1,24 @@
 use crate::db::crud_trait::HistoryCRUD;
 use crate::models::{allowed_model::AllowedModel, history::HistoryQuery};
+use actix_files::NamedFile;
+use actix_web::HttpRequest;
 use actix_web::{
     delete, get, post, put,
     web::{self, Data, Json},
-    HttpResponse,
+    HttpResponse, Responder,
 };
 use chrono::NaiveDate;
 use std::error::Error;
+use std::path::PathBuf;
+
+#[get("/")]
+pub async fn root_handler(req: HttpRequest) -> impl Responder {
+    let path: PathBuf = PathBuf::from("src/static/index.html");
+    match NamedFile::open(path) {
+        Ok(file) => file.into_response(&req),
+        Err(_) => HttpResponse::InternalServerError().body("Could not open static file"),
+    }
+}
 
 #[get("/get-depths-history")]
 pub async fn get_depth_history(

@@ -22,3 +22,4 @@ env_logger = "0.10"
 reqwest = { version = "0.11.27", features = ["json", "rustls", "blocking"] }
 tokio = { version = "1", features = ["full"] }
 chrono = { version = "0.4", features = ["serde"] }
+actix-files = "0.6"

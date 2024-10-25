@@ -1,5 +1,5 @@
-# Use the official Rust image
-FROM debian:bullseye-slim
+    # Use the official Rust image for the build stage
+FROM rust:latest AS builder
 
 # Create a new binary project directory
 RUN USER=root cargo new --bin week-3-assignment
@@ -20,10 +20,10 @@ RUN rm -f src/fetcher.rs  # Remove fetcher.rs if it exists
 RUN cargo build --release
 
 # Set up the final image
-FROM debian:buster-slim
-# Copy the built binary to the runtime image
+FROM debian:bullseye-slim
+
+# Copy the built binary from the "builder" stage to the runtime image
 COPY --from=builder /week-3-assignment/target/release/week-3-assignment /usr/local/bin/week-3-assignment
 
 # Set the startup command
 CMD ["week-3-assignment"]
-

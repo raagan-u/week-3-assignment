@@ -29,7 +29,12 @@ pub async fn get_depth_history(
 
     // Extract pagination, sorting, and filtering parameters
     let date_range = query_params.date_range.clone();
-    let liquidity_gt = query_params.liquidity_gt;
+    let cmp_field = query_params
+        .cmp_field
+        .clone()
+        .unwrap_or("histId".to_string());
+    let cmp_units = query_params.cmp_units;
+    let cmp_op = query_params.cmp_op.unwrap_or("e".to_string());
 
     let sort_by = query_params
         .sort_by
@@ -70,13 +75,15 @@ pub async fn get_depth_history(
             "depth_history",
             start_epoch,
             end_epoch,
-            liquidity_gt,
             sort_by,
             order,
             page,
             limit,
             count,
             interval,
+            cmp_field,
+            cmp_units,
+            cmp_op,
         )
         .await
     {
@@ -94,7 +101,12 @@ pub async fn get_earnings_history(
 
     // Extract pagination, sorting, and filtering parameters
     let date_range = query_params.date_range.clone();
-    let liquidity_gt = query_params.liquidity_gt;
+    let cmp_field = query_params
+        .cmp_field
+        .clone()
+        .unwrap_or("histId".to_string());
+    let cmp_units = query_params.cmp_units;
+    let cmp_op = query_params.cmp_op.unwrap_or("e".to_string());
 
     let sort_by = query_params
         .sort_by
@@ -135,13 +147,15 @@ pub async fn get_earnings_history(
             "earnings_history",
             start_epoch,
             end_epoch,
-            liquidity_gt,
             sort_by,
             order,
             page,
             limit,
             count,
             interval,
+            cmp_field,
+            cmp_units,
+            cmp_op,
         )
         .await
     {
@@ -159,7 +173,12 @@ pub async fn get_swap_history(
 
     // Extract pagination, sorting, and filtering parameters
     let date_range = query_params.date_range.clone();
-    let liquidity_gt = query_params.liquidity_gt;
+    let cmp_field = query_params
+        .cmp_field
+        .clone()
+        .unwrap_or("histId".to_string());
+    let cmp_units = query_params.cmp_units;
+    let cmp_op = query_params.cmp_op.unwrap_or("e".to_string());
 
     let sort_by = query_params
         .sort_by
@@ -200,13 +219,15 @@ pub async fn get_swap_history(
             "swap_history",
             start_epoch,
             end_epoch,
-            liquidity_gt,
             sort_by,
             order,
             page,
             limit,
             count,
             interval,
+            cmp_field,
+            cmp_units,
+            cmp_op,
         )
         .await
     {
@@ -224,12 +245,17 @@ pub async fn get_runepool_history(
 
     // Extract pagination, sorting, and filtering parameters
     let date_range = query_params.date_range.clone();
-    let liquidity_gt = query_params.liquidity_gt;
+    let cmp_field = query_params
+        .cmp_field
+        .clone()
+        .unwrap_or("histId".to_string());
+    let cmp_units = query_params.cmp_units;
+    let cmp_op = query_params.cmp_op.unwrap_or("e".to_string());
 
     let sort_by = query_params
         .sort_by
         .clone()
-        .unwrap_or_else(|| "timestamp".to_string());
+        .unwrap_or_else(|| "histId".to_string());
 
     let order = query_params
         .order
@@ -265,13 +291,15 @@ pub async fn get_runepool_history(
             "runepool_history",
             start_epoch,
             end_epoch,
-            liquidity_gt,
             sort_by,
             order,
             page,
             limit,
             count,
             interval,
+            cmp_field,
+            cmp_units,
+            cmp_op,
         )
         .await
     {

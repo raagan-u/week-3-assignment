@@ -229,7 +229,6 @@ pub struct RunePoolHistory {
 #[derive(Deserialize)]
 pub struct HistoryQuery {
     pub date_range: Option<String>, // e.g., "2023-08-01,2023-09-01"
-    pub liquidity_gt: Option<i64>,  // Filter by liquidity greater than
     pub sort_by: Option<String>,    // Sorting field, e.g., "timestamp"
     pub order: Option<String>,      // "asc" or "desc"
     pub page: Option<u32>,          // Page number for pagination
@@ -238,4 +237,7 @@ pub struct HistoryQuery {
     pub to: Option<i64>,
     pub count: Option<u32>,
     pub interval: Option<String>,
+    pub cmp_field: Option<String>,
+    pub cmp_units: Option<i64>,
+    pub cmp_op: Option<String>,
 }

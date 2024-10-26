@@ -39,13 +39,15 @@ impl HistoryCRUD for MongoDbStore {
         collection_name: &str,
         start_epoch: Option<i64>,
         end_epoch: Option<i64>,
-        liquidity_gt: Option<i64>,
         sort_by: String,
         order: String,
         page: u32,
         limit: u32,
         count: u32,
         interval: Option<String>,
+        cmp_field: String,
+        cmp_units: Option<i64>,
+        cmp_op: String,
     ) -> Result<Vec<AllowedModel>, Box<dyn StdError>> {
         let mut pipeline = Vec::new();
 
@@ -73,11 +75,11 @@ impl HistoryCRUD for MongoDbStore {
         }
 
         // Add liquidity filter if provided
-        if let Some(liquidity_gt_value) = liquidity_gt {
+        if let Some(cmp_val) = cmp_units {
             match_conditions.insert(
-                "liquidityUnits",
+                cmp_field,
                 doc! {
-                    "$gt": Bson::Int64(liquidity_gt_value)
+                    format!("${}", cmp_op): Bson::Int64(cmp_val)
                 },
             );
         }

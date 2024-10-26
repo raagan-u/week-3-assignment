@@ -52,48 +52,187 @@
             </p>
 
             <div class="params">
-                <h3>Query Parameters</h3>
+                <h3>API Parameters</h3>
+                <h4>Query Parameters</h4>
                 <ul>
                     <li>
-                        <code>date_range</code>: Date range filter in a specific
-                        format.
+                        <code>date_range</code>: A tuple of two dates used to
+                        filter records based on their date range.
                     </li>
-                    <li><code>from</code>: Start date (timestamp).</li>
-                    <li><code>to</code>: End date (timestamp).</li>
+                    <ul>
+                        <li><strong>Type:</strong> start_date, end_date</li>
+                        <li>
+                            <strong>Description:</strong> This parameter allows
+                            filtering of records based on a specified date
+                            range. You can provide either start_date, end_date,
+                            or both. If only one date is provided, it will act
+                            as a boundary for filtering.
+                        </li>
+                    </ul>
                     <li>
-                        <code>liquidity_gt</code>: Minimum liquidity filter.
+                        <code>sort_by</code>: The field by which the results
+                        will be sorted.
                     </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the field
+                            name used for sorting the results. Sorting can be
+                            applied in ascending or descending order.
+                        </li>
+                    </ul>
                     <li>
-                        <code>sort_by</code>: Field to sort by <code></code>.
+                        <code>order</code>: The order in which the results
+                        should be sorted.
                     </li>
+                    <ul>
+                        <li><strong>Type:</strong> string (optional)</li>
+                        <li>
+                            <strong>Values:</strong> asc (ascending, default) or
+                            desc (descending)
+                        </li>
+                        <li>
+                            <strong>Description:</strong> Determines the sorting
+                            order of the results. If not specified, the default
+                            order is ascending.
+                        </li>
+                    </ul>
+                    <li><code>page</code>: The page number for pagination.</li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the page
+                            number to retrieve, allowing for paginated results.
+                        </li>
+                    </ul>
                     <li>
-                        <code>order</code>: Sorting order (<code>asc</code> or
-                        <code>desc</code>).
+                        <code>limit</code>: The maximum number of records to
+                        return per page.
                     </li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Defines how many
+                            records should be returned per page of results.
+                        </li>
+                    </ul>
                     <li>
-                        <code>page</code>: Page number for pagination (default:
-                        <code>1</code>).
+                        <code>from</code>: The starting timestamp for fetching
+                        records.
                     </li>
+                    <ul>
+                        <li><strong>Type:</strong> timestamp</li>
+                        <li>
+                            <strong>Description:</strong> The timestamp from
+                            which records should be fetched.
+                        </li>
+                    </ul>
                     <li>
-                        <code>limit</code>: Number of results per page (default:
-                        <code>10</code>).
+                        <code>to</code>: The ending timestamp for fetching
+                        records.
                     </li>
+                    <ul>
+                        <li><strong>Type:</strong> timestamp</li>
+                        <li>
+                            <strong>Description:</strong> The timestamp until
+                            which records should be fetched.
+                        </li>
+                    </ul>
                     <li>
-                        <code>count</code>: Total number of records to fetch
-                        (default: <code>30</code>).
+                        <code>interval</code>: The time interval for grouping
+                        records.
                     </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the time
+                            interval for aggregating records into buckets.
+                        </li>
+                    </ul>
                     <li>
-                        <code>interval</code>: Time interval between records.
+                        <code>count</code>: The number of buckets to limit after
+                        applying the interval.
                     </li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Sets a limit on the
+                            number of buckets returned after applying the
+                            specified interval.
+                        </li>
+                    </ul>
+                </ul>
+                <h4>Filtering Parameters</h4>
+                <ul>
+                    <li>
+                        <code>cmp_field</code>: The field used for filtering
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Indicates the field
+                            against which records will be filtered.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>cmp_units</code>: The number of units to use in
+                        the comparison.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> number</li>
+                        <li>
+                            <strong>Description:</strong> The value to be used
+                            for comparison in the filter.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>cmp_op</code>: The comparison operator to use for
+                        filtering records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Values:</strong>
+                            <ul>
+                                <li>$gte: Greater than or equal to</li>
+                                <li>$lt: Less than</li>
+                                <li>$lte: Less than or equal to</li>
+                                <li>$eq: Equal to</li>
+                                <li>$ne: Not equal to</li>
+                                <li>
+                                    $in: Matches any of the values specified in
+                                    an array
+                                </li>
+                                <li>
+                                    $nin: Does not match any of the values
+                                    specified in an array
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Description:</strong> Specifies the operator
+                            to be used for comparison with cmp_field and
+                            cmp_units.
+                        </li>
+                    </ul>
                 </ul>
             </div>
 
             <div class="examples">
-                <h3>Example Request</h3>
+                <h3>Example Usage</h3>
                 <code
                     >GET
-                    /get-depths-history?from=1620000000&to=1630000000&liquidity_gt=5000&sort_by=histId&order=desc&page=2&limit=15</code
+                    /get-depths-history?date_range=2024-01-01,2024-12-31&sort_by=created_at&order=asc&page=1&limit=10&from=1622505600&to=1625097600&interval=1d&count=10&cmp_field=amount&cmp_units=100&cmp_op=$gte</code
                 >
+                <p>
+                    This request retrieves records created between January 1,
+                    2024, and December 31, 2024, sorted by the
+                    <code>created_at</code> field in ascending order, paginated
+                    to the first page with a limit of 10 records, and filtered
+                    to only include records where <code>amount</code> is greater
+                    than or equal to 100.
+                </p>
             </div>
         </div>
 
@@ -109,80 +248,578 @@
             </p>
 
             <div class="params">
-                <h3>Query Parameters</h3>
+                <h3>API Parameters</h3>
+                <h4>Query Parameters</h4>
                 <ul>
                     <li>
-                        Same parameters as
-                        <strong>Get Depths History</strong> (see above).
+                        <code>date_range</code>: A tuple of two dates used to
+                        filter records based on their date range.
                     </li>
+                    <ul>
+                        <li><strong>Type:</strong> start_date, end_date</li>
+                        <li>
+                            <strong>Description:</strong> This parameter allows
+                            filtering of records based on a specified date
+                            range. You can provide either start_date, end_date,
+                            or both. If only one date is provided, it will act
+                            as a boundary for filtering.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>sort_by</code>: The field by which the results
+                        will be sorted.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the field
+                            name used for sorting the results. Sorting can be
+                            applied in ascending or descending order.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>order</code>: The order in which the results
+                        should be sorted.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string (optional)</li>
+                        <li>
+                            <strong>Values:</strong> asc (ascending, default) or
+                            desc (descending)
+                        </li>
+                        <li>
+                            <strong>Description:</strong> Determines the sorting
+                            order of the results. If not specified, the default
+                            order is ascending.
+                        </li>
+                    </ul>
+                    <li><code>page</code>: The page number for pagination.</li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the page
+                            number to retrieve, allowing for paginated results.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>limit</code>: The maximum number of records to
+                        return per page.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Defines how many
+                            records should be returned per page of results.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>from</code>: The starting timestamp for fetching
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> timestamp</li>
+                        <li>
+                            <strong>Description:</strong> The timestamp from
+                            which records should be fetched.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>to</code>: The ending timestamp for fetching
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> timestamp</li>
+                        <li>
+                            <strong>Description:</strong> The timestamp until
+                            which records should be fetched.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>interval</code>: The time interval for grouping
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the time
+                            interval for aggregating records into buckets.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>count</code>: The number of buckets to limit after
+                        applying the interval.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Sets a limit on the
+                            number of buckets returned after applying the
+                            specified interval.
+                        </li>
+                    </ul>
+                </ul>
+                <h4>Filtering Parameters</h4>
+                <ul>
+                    <li>
+                        <code>cmp_field</code>: The field used for filtering
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Indicates the field
+                            against which records will be filtered.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>cmp_units</code>: The number of units to use in
+                        the comparison.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> number</li>
+                        <li>
+                            <strong>Description:</strong> The value to be used
+                            for comparison in the filter.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>cmp_op</code>: The comparison operator to use for
+                        filtering records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Values:</strong>
+                            <ul>
+                                <li>$gte: Greater than or equal to</li>
+                                <li>$lt: Less than</li>
+                                <li>$lte: Less than or equal to</li>
+                                <li>$eq: Equal to</li>
+                                <li>$ne: Not equal to</li>
+                                <li>
+                                    $in: Matches any of the values specified in
+                                    an array
+                                </li>
+                                <li>
+                                    $nin: Does not match any of the values
+                                    specified in an array
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Description:</strong> Specifies the operator
+                            to be used for comparison with cmp_field and
+                            cmp_units.
+                        </li>
+                    </ul>
                 </ul>
             </div>
 
             <div class="examples">
-                <h3>Example Request</h3>
+                <h3>Example Usage</h3>
                 <code
                     >GET
-                    /get-earnings-history?date_range=2021-01-01_to_2021-12-31&order=asc&limit=20</code
+                    /get-earnings-history?date_range=2024-01-01,2024-12-31&sort_by=created_at&order=asc&page=1&limit=10&from=1622505600&to=1625097600&interval=1d&count=10&cmp_field=amount&cmp_units=100&cmp_op=$gte</code
                 >
+                <p>
+                    This request retrieves records created between January 1,
+                    2024, and December 31, 2024, sorted by the
+                    <code>created_at</code> field in ascending order, paginated
+                    to the first page with a limit of 10 records, and filtered
+                    to only include records where <code>amount</code> is greater
+                    than or equal to 100.
+                </p>
             </div>
         </div>
-
         <div class="endpoint">
             <h2>3. Get Swaps History</h2>
             <p>
-                <strong>Endpoint:</strong> <code>GET /get-swaps-history</code>
+                <strong>Endpoint:</strong>
+                <code>GET /get-swaps-history</code>
             </p>
             <p>
-                <strong>Description:</strong> Retrieves swaps history with
-                options for pagination, sorting, and filtering.
+                <strong>Description:</strong> Retrieves swap history with
+                filtering, sorting, and pagination options.
             </p>
 
             <div class="params">
-                <h3>Query Parameters</h3>
+                <h3>API Parameters</h3>
+                <h4>Query Parameters</h4>
                 <ul>
                     <li>
-                        Same parameters as
-                        <strong>Get Depths History</strong> (see above).
+                        <code>date_range</code>: A tuple of two dates used to
+                        filter records based on their date range.
                     </li>
+                    <ul>
+                        <li><strong>Type:</strong> start_date, end_date</li>
+                        <li>
+                            <strong>Description:</strong> This parameter allows
+                            filtering of records based on a specified date
+                            range. You can provide either start_date, end_date,
+                            or both. If only one date is provided, it will act
+                            as a boundary for filtering.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>sort_by</code>: The field by which the results
+                        will be sorted.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the field
+                            name used for sorting the results. Sorting can be
+                            applied in ascending or descending order.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>order</code>: The order in which the results
+                        should be sorted.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string (optional)</li>
+                        <li>
+                            <strong>Values:</strong> asc (ascending, default) or
+                            desc (descending)
+                        </li>
+                        <li>
+                            <strong>Description:</strong> Determines the sorting
+                            order of the results. If not specified, the default
+                            order is ascending.
+                        </li>
+                    </ul>
+                    <li><code>page</code>: The page number for pagination.</li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the page
+                            number to retrieve, allowing for paginated results.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>limit</code>: The maximum number of records to
+                        return per page.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Defines how many
+                            records should be returned per page of results.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>from</code>: The starting timestamp for fetching
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> timestamp</li>
+                        <li>
+                            <strong>Description:</strong> The timestamp from
+                            which records should be fetched.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>to</code>: The ending timestamp for fetching
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> timestamp</li>
+                        <li>
+                            <strong>Description:</strong> The timestamp until
+                            which records should be fetched.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>interval</code>: The time interval for grouping
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the time
+                            interval for aggregating records into buckets.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>count</code>: The number of buckets to limit after
+                        applying the interval.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Sets a limit on the
+                            number of buckets returned after applying the
+                            specified interval.
+                        </li>
+                    </ul>
+                </ul>
+                <h4>Filtering Parameters</h4>
+                <ul>
+                    <li>
+                        <code>cmp_field</code>: The field used for filtering
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Indicates the field
+                            against which records will be filtered.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>cmp_units</code>: The number of units to use in
+                        the comparison.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> number</li>
+                        <li>
+                            <strong>Description:</strong> The value to be used
+                            for comparison in the filter.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>cmp_op</code>: The comparison operator to use for
+                        filtering records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Values:</strong>
+                            <ul>
+                                <li>$gte: Greater than or equal to</li>
+                                <li>$lt: Less than</li>
+                                <li>$lte: Less than or equal to</li>
+                                <li>$eq: Equal to</li>
+                                <li>$ne: Not equal to</li>
+                                <li>
+                                    $in: Matches any of the values specified in
+                                    an array
+                                </li>
+                                <li>
+                                    $nin: Does not match any of the values
+                                    specified in an array
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Description:</strong> Specifies the operator
+                            to be used for comparison with cmp_field and
+                            cmp_units.
+                        </li>
+                    </ul>
                 </ul>
             </div>
 
             <div class="examples">
-                <h3>Example Request</h3>
+                <h3>Example Usage</h3>
                 <code
                     >GET
-                    /get-swaps-history?from=1620000000&sort_by=histId&order=desc&liquidity_gt=1000&page=1&limit=10</code
+                    /get-swaps-history?date_range=2024-01-01,2024-12-31&sort_by=created_at&order=asc&page=1&limit=10&from=1622505600&to=1625097600&interval=1d&count=10&cmp_field=amount&cmp_units=100&cmp_op=$gte</code
                 >
+                <p>
+                    This request retrieves records created between January 1,
+                    2024, and December 31, 2024, sorted by the
+                    <code>created_at</code> field in ascending order, paginated
+                    to the first page with a limit of 10 records, and filtered
+                    to only include records where <code>amount</code> is greater
+                    than or equal to 100.
+                </p>
             </div>
         </div>
 
         <div class="endpoint">
-            <h2>4. Get Rune Pool History</h2>
+            <h2>4. Get RunePool History</h2>
             <p>
                 <strong>Endpoint:</strong>
                 <code>GET /get-runepool-history</code>
             </p>
             <p>
-                <strong>Description:</strong> Retrieves history of the Rune pool
-                with various filtering, pagination, and sorting options.
+                <strong>Description:</strong> Retrieves RunePool history with
+                filtering, sorting, and pagination options.
             </p>
 
             <div class="params">
-                <h3>Query Parameters</h3>
+                <h3>API Parameters</h3>
+                <h4>Query Parameters</h4>
                 <ul>
                     <li>
-                        Same parameters as
-                        <strong>Get Depths History</strong> (see above).
+                        <code>date_range</code>: A tuple of two dates used to
+                        filter records based on their date range.
                     </li>
+                    <ul>
+                        <li><strong>Type:</strong> start_date, end_date</li>
+                        <li>
+                            <strong>Description:</strong> This parameter allows
+                            filtering of records based on a specified date
+                            range. You can provide either start_date, end_date,
+                            or both. If only one date is provided, it will act
+                            as a boundary for filtering.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>sort_by</code>: The field by which the results
+                        will be sorted.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the field
+                            name used for sorting the results. Sorting can be
+                            applied in ascending or descending order.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>order</code>: The order in which the results
+                        should be sorted.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string (optional)</li>
+                        <li>
+                            <strong>Values:</strong> asc (ascending, default) or
+                            desc (descending)
+                        </li>
+                        <li>
+                            <strong>Description:</strong> Determines the sorting
+                            order of the results. If not specified, the default
+                            order is ascending.
+                        </li>
+                    </ul>
+                    <li><code>page</code>: The page number for pagination.</li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the page
+                            number to retrieve, allowing for paginated results.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>limit</code>: The maximum number of records to
+                        return per page.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Defines how many
+                            records should be returned per page of results.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>from</code>: The starting timestamp for fetching
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> timestamp</li>
+                        <li>
+                            <strong>Description:</strong> The timestamp from
+                            which records should be fetched.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>to</code>: The ending timestamp for fetching
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> timestamp</li>
+                        <li>
+                            <strong>Description:</strong> The timestamp until
+                            which records should be fetched.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>interval</code>: The time interval for grouping
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Specifies the time
+                            interval for aggregating records into buckets.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>count</code>: The number of buckets to limit after
+                        applying the interval.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> integer</li>
+                        <li>
+                            <strong>Description:</strong> Sets a limit on the
+                            number of buckets returned after applying the
+                            specified interval.
+                        </li>
+                    </ul>
+                </ul>
+                <h4>Filtering Parameters</h4>
+                <ul>
+                    <li>
+                        <code>cmp_field</code>: The field used for filtering
+                        records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Description:</strong> Indicates the field
+                            against which records will be filtered.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>cmp_units</code>: The number of units to use in
+                        the comparison.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> number</li>
+                        <li>
+                            <strong>Description:</strong> The value to be used
+                            for comparison in the filter.
+                        </li>
+                    </ul>
+                    <li>
+                        <code>cmp_op</code>: The comparison operator to use for
+                        filtering records.
+                    </li>
+                    <ul>
+                        <li><strong>Type:</strong> string</li>
+                        <li>
+                            <strong>Values:</strong>
+                            <ul>
+                                <li>$gte: Greater than or equal to</li>
+                                <li>$lt: Less than</li>
+                                <li>$lte: Less than or equal to</li>
+                                <li>$eq: Equal to</li>
+                                <li>$ne: Not equal to</li>
+                                <li>
+                                    $in: Matches any of the values specified in
+                                    an array
+                                </li>
+                                <li>
+                                    $nin: Does not match any of the values
+                                    specified in an array
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Description:</strong> Specifies the operator
+                            to be used for comparison with cmp_field and
+                            cmp_units.
+                        </li>
+                    </ul>
                 </ul>
             </div>
 
             <div class="examples">
-                <h3>Example Request</h3>
+                <h3>Example Usage</h3>
                 <code
                     >GET
-                    /get-runepool-history?to=1630000000&sort_by=histId&order=asc&page=3&limit=5&count=50</code
+                    /get-runepool-history?date_range=2024-01-01,2024-12-31&sort_by=created_at&order=asc&page=1&limit=10&from=1622505600&to=1625097600&interval=1d&count=10&cmp_field=liquidity&cmp_units=100&cmp_op=$gte</code
                 >
+                <p>
+                    This request retrieves records created between January 1,
+                    2024, and December 31, 2024, sorted by the
+                    <code>created_at</code> field in ascending order, paginated
+                    to the first page with a limit of 10 records, and filtered
+                    to only include records where <code>liquidity</code> is
+                    greater than or equal to 100.
+                </p>
             </div>
         </div>
     </body>

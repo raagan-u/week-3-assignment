@@ -7,13 +7,15 @@ pub trait HistoryCRUD: Send + Sync {
         collection_name: &str,
         start_epoch: Option<i64>,
         end_epoch: Option<i64>,
-        liquidity_gt: Option<i64>,
         sort_by: String,
         order: String,
         page: u32,
         limit: u32,
         count: u32,
         interval: Option<String>,
+        cmp_field: String,
+        cmp_units: Option<i64>,
+        cmp_op: String,
     ) -> Result<Vec<AllowedModel>, Box<dyn std::error::Error>>;
 
     async fn create_history(

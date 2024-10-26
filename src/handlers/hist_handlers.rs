@@ -490,6 +490,7 @@ pub async fn delete_runepool_history(
     path: web::Path<i64>,
 ) -> HttpResponse {
     let hist_id = path.into_inner();
+    println!("{:#?}", hist_id);
     match db.delete_history("runepool_history", hist_id).await {
         Ok(_) => HttpResponse::Ok().body("History deleted successfully"),
         Err(e) => {

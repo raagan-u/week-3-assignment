@@ -205,6 +205,14 @@ pub struct EarningsHistory {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct EarningsWithPools {
+    #[serde(flatten)]
+    pub history: EarningsHistory,
+    pub pools: Vec<Pool>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct RunePoolHistory {
     #[serde(deserialize_with = "deserialize_i64_from_string_or_number")]
     pub hist_id: i64,

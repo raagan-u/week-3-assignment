@@ -1,9 +1,10 @@
 use super::config::DbConfig;
-use crate::db::crud_trait::HistoryCRUD;
 use crate::models::allowed_model::AllowedModel;
+use crate::models::history::EarningsWithPools;
+use crate::{db::crud_trait::HistoryCRUD, models::history::Pool};
 
 use async_trait::async_trait; // Ensure you import async_trait
-use futures::StreamExt;
+use futures::{StreamExt, TryStreamExt};
 use mongodb::{
     bson::{self, doc, to_document, Bson, Document},
     error::{Error, ErrorKind, WriteFailure},
@@ -162,7 +163,27 @@ impl HistoryCRUD for MongoDbStore {
         while let Some(result) = cursor.next().await {
             match result {
                 Ok(document) => match bson::from_document::<AllowedModel>(document) {
-                    Ok(history) => histories.push(history),
+                    Ok(history) => {
+                        if collection_name == "earnings_history" {
+                            let pools_collection = self.database.collection("earnings_pools");
+                            let mut pools_cursor = pools_collection
+                                .find(doc! { "histId": history.hist_id() }, None)
+                                .await?;
+
+                            let pools: Vec<Pool> = pools_cursor.try_collect().await?;
+                            let earnings_with_pools =
+                                AllowedModel::EarningsWithPools(EarningsWithPools {
+                                    history: match history {
+                                        AllowedModel::EarnHistory(e) => e,
+                                        _ => continue, // Skip if not of type `EarnHistory`
+                                    },
+                                    pools,
+                                });
+                            histories.push(earnings_with_pools);
+                        } else {
+                            histories.push(history);
+                        }
+                    }
                     Err(e) => eprintln!("Deserialization error: {:?}", e),
                 },
                 Err(e) => eprintln!("Cursor error: {:?}", e),

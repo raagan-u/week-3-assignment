@@ -64,8 +64,7 @@
                         <code>liquidity_gt</code>: Minimum liquidity filter.
                     </li>
                     <li>
-                        <code>sort_by</code>: Field to sort by (default:
-                        <code>timestamp</code>).
+                        <code>sort_by</code>: Field to sort by <code></code>.
                     </li>
                     <li>
                         <code>order</code>: Sorting order (<code>asc</code> or
@@ -93,7 +92,7 @@
                 <h3>Example Request</h3>
                 <code
                     >GET
-                    /get-depths-history?from=1620000000&to=1630000000&liquidity_gt=5000&sort_by=timestamp&order=desc&page=2&limit=15</code
+                    /get-depths-history?from=1620000000&to=1630000000&liquidity_gt=5000&sort_by=histId&order=desc&page=2&limit=15</code
                 >
             </div>
         </div>
@@ -152,7 +151,7 @@
                 <h3>Example Request</h3>
                 <code
                     >GET
-                    /get-swaps-history?from=1620000000&sort_by=timestamp&order=desc&liquidity_gt=1000&page=1&limit=10</code
+                    /get-swaps-history?from=1620000000&sort_by=histId&order=desc&liquidity_gt=1000&page=1&limit=10</code
                 >
             </div>
         </div>
@@ -182,7 +181,7 @@
                 <h3>Example Request</h3>
                 <code
                     >GET
-                    /get-runepool-history?to=1630000000&sort_by=timestamp&order=asc&page=3&limit=5&count=50</code
+                    /get-runepool-history?to=1630000000&sort_by=histId&order=asc&page=3&limit=5&count=50</code
                 >
             </div>
         </div>
